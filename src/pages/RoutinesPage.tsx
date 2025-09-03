@@ -3,6 +3,13 @@ import { VStack, Heading, Text, FormControl, FormLabel, Input, Textarea, Button,
 import { FaTrashAlt } from 'react-icons/fa';
 import { useAppContext } from '../context/AppContext';
 
+// Interfaces definidas localmente
+interface RoutineTemplate {
+  id: number;
+  name: string;
+  items: string[];
+}
+
 export function RoutinesPage() {
   const { templates, addTemplate, deleteTemplate } = useAppContext();
   const [name, setName] = useState('');
@@ -26,7 +33,7 @@ export function RoutinesPage() {
     <VStack spacing={8} align="stretch" w="100%">
       <VStack align="start">
         <Heading>Templates de Rotinas</Heading>
-        {/* TEXTO ADICIONADO */}
+        {/* TEXTO DE INSTRUÇÃO ADICIONADO */}
         <Text color="gray.500">Crie listas de tarefas reutilizáveis para as suas rotinas diárias, semanais ou para qualquer outra finalidade.</Text>
       </VStack>
 

@@ -1,7 +1,13 @@
-// src/pages/AchievementsPage.tsx
 import { useState } from 'react';
 import { VStack, Heading, Text, Input, Button, HStack, Box } from '@chakra-ui/react';
 import { useAppContext } from '../context/AppContext';
+
+// Interfaces definidas localmente
+interface Achievement {
+  id: number;
+  text: string;
+  date: string;
+}
 
 export function AchievementsPage() {
   const { achievements, addAchievement } = useAppContext();
@@ -14,7 +20,6 @@ export function AchievementsPage() {
     setNewAchievementText('');
   };
 
-  // Agrupa as conquistas por data para uma melhor visualização
   const groupedAchievements = achievements.reduce((acc, achievement) => {
     const date = achievement.date;
     if (!acc[date]) {
@@ -22,18 +27,19 @@ export function AchievementsPage() {
     }
     acc[date].push(achievement);
     return acc;
-  }, {});
+  }, {} as Record<string, Achievement[]>);
 
   return (
-    <VStack spacing={8} align="start" w="100%" maxW="600px">
+    <VStack spacing={8} align="stretch" w="100%">
       <VStack align="start">
         <Heading>Diário de Conquistas</Heading>
+        {/* TEXTO DE INSTRUÇÃO ADICIONADO */}
         <Text color="gray.500">
-          Anote as suas vitórias do dia, não importa o quão pequenas pareçam.
+          Anote as suas vitórias do dia, não importa o quão pequenas pareçam. Celebrar o progresso é um grande motivador!
         </Text>
       </VStack>
 
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+      <Box as="form" onSubmit={handleSubmit} p={6} bg="white" borderRadius="md" boxShadow="sm" w="100%">
         <HStack w="100%">
           <Input 
             value={newAchievementText}
@@ -41,7 +47,7 @@ export function AchievementsPage() {
             placeholder="Qual foi a sua conquista de hoje?"
             variant="filled"
           />
-          <Button type="submit" colorScheme="teal" px={8}>Adicionar</Button>
+          <Button type="submit" colorScheme="bluePrimary" px={8}>Adicionar</Button>
         </HStack>
       </form>
 
@@ -50,10 +56,10 @@ export function AchievementsPage() {
           Object.entries(groupedAchievements).map(([date, achievementsOnDate]) => (
             <Box key={date}>
               <Heading size="md" mb={2}>
-                {new Date(date + 'T00:00:00').toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </Heading>
               <VStack align="stretch" spacing={2}>
-                {achievementsOnDate.map(ach => (
+                {(achievementsOnDate as Achievement[]).map(ach => (
                   <Text key={ach.id} bg="white" p={3} borderRadius="md" boxShadow="sm">
                     - {ach.text}
                   </Text>

@@ -17,12 +17,7 @@ interface RoutineTemplate { id: number; name: string; items: string[]; }
 interface ToolboxItem { id: number; type: 'note' | 'link'; title: string; content: string; }
 interface ShoppingListItem { id: number; text: string; isCompleted: boolean; }
 interface ShoppingList { id: number; name: string; items: ShoppingListItem[]; }
-interface MoodEntry {
-  id: number;
-  mood: string;
-  note?: string;
-  date: string;
-}
+interface MoodEntry { id: number; mood: string; note?: string; date: string; }
 interface UserProfile {
   xp: number;
   level: number;

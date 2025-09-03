@@ -1,16 +1,17 @@
-import { Box, VStack, Heading, Button, Spacer, Text, Spinner, IconButton, useColorMode, HStack, Tooltip, Progress, Icon } from '@chakra-ui/react';
+import { Box, VStack, Heading, Button, Spacer, Text, Spinner, IconButton, useColorMode, HStack, Tooltip, Progress, Icon, Image, Link } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaMusic, FaCog, FaTrophy, FaChartLine, FaSignOutAlt, FaSignInAlt, FaClipboardList, FaFirstAid, FaSun, FaMoon, FaShoppingCart, FaSmile, FaQuestionCircle } from 'react-icons/fa';
+import { FaHome, FaMusic, FaCog, FaTrophy, FaChartLine, FaSignOutAlt, FaSignInAlt, FaClipboardList, FaFirstAid, FaSun, FaMoon, FaShoppingCart, FaSmile, FaQuestionCircle, FaCalendarAlt } from 'react-icons/fa';
 import { useAppContext } from '../../context/AppContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
+import appLogo from '../../assets/logo.png';
 
 const NavItem = ({ to, icon, children }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   return (
     <RouterLink to={to} style={{ width: '100%' }}>
-      <Button leftIcon={icon} justifyContent="start" w="100%" variant={isActive ? 'solid' : 'ghost'} colorScheme="teal">
+      <Button leftIcon={icon} justifyContent="start" w="100%" variant={isActive ? 'solid' : 'ghost'} colorScheme="bluePrimary">
         {children}
       </Button>
     </RouterLink>
@@ -26,13 +27,15 @@ export function Sidebar() {
     try {
       await signOut(auth);
       navigate('/login');
-    } catch (error) { // <-- A CORREÇÃO ESTÁ AQUI
+    } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
   };
-
+  
+  const xp = userProfile?.xp || 0;
+  const level = userProfile?.level || 1;
   const xpForNextLevel = 1000;
-  const currentLevelXp = userProfile.xp % xpForNextLevel;
+  const currentLevelXp = xp % xpForNextLevel;
   const progressPercent = (currentLevelXp / xpForNextLevel) * 100;
 
   return (
@@ -47,15 +50,17 @@ export function Sidebar() {
       flexDirection="column"
       bg={colorMode === 'light' ? 'gray.100' : 'gray.800'}
     >
-      <Heading size="md" mb={6} color="teal.500">Mente em Foco</Heading>
+      <RouterLink to="/"> 
+        <Image src={appLogo} alt="Mente em Foco Logo" width="100%" maxWidth="180px" mx="auto" mb={6} />
+      </RouterLink>
 
       {currentUser && (
         <Box w="100%" p={3} bg="blackAlpha.200" borderRadius="md" mb={6}>
           <HStack>
             <Icon as={FaTrophy} color="yellow.400" />
-            <Text fontWeight="bold" fontSize="sm">Nível {userProfile.level}</Text>
+            <Text fontWeight="bold" fontSize="sm">Nível {level}</Text>
           </HStack>
-          <Tooltip label={`${userProfile.xp % 1000} / 1000 XP para o próximo nível`}>
+          <Tooltip label={`${currentLevelXp} / ${xpForNextLevel} XP para o próximo nível`}>
             <Progress value={progressPercent} size="sm" colorScheme="yellow" mt={2} borderRadius="sm" />
           </Tooltip>
         </Box>
@@ -66,6 +71,7 @@ export function Sidebar() {
         <NavItem to="/progresso" icon={<FaChartLine />}>Progresso</NavItem>
         <NavItem to="/humor" icon={<FaSmile />}>Humor</NavItem>
         <NavItem to="/conquistas" icon={<FaTrophy />}>Conquistas</NavItem>
+        <NavItem to="/calendario" icon={<FaCalendarAlt />}>Calendário</NavItem>
         <NavItem to="/compras" icon={<FaShoppingCart />}>Compras</NavItem>
         <NavItem to="/rotinas" icon={<FaClipboardList />}>Rotinas</NavItem>
         <NavItem to="/caixa-de-ferramentas" icon={<FaFirstAid />}>Caixa de Ferramentas</NavItem>
@@ -101,10 +107,21 @@ export function Sidebar() {
             </VStack>
           ) : (
             <RouterLink to="/login">
-              <Button w="100%" colorScheme="teal" leftIcon={<FaSignInAlt />}>Login</Button>
+              <Button w="100%" colorScheme="bluePrimary" leftIcon={<FaSignInAlt />}>Login</Button>
             </RouterLink>
           )}
         </Box>
+        
+        {/* --- CRÉDITOS ADICIONADOS --- */}
+        <Box pt={4} textAlign="center">
+          <Text fontSize="xs" color="gray.500">
+            © 2025 - Rubem Cesar Terapias
+          </Text>
+          <Link href="https://rubemcesarterapias.com" isExternal fontSize="xs" color="blue.500">
+            rubemcesarterapias.com
+          </Link>
+        </Box>
+
       </VStack>
     </Box>
   );

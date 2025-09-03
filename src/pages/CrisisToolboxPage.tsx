@@ -1,11 +1,18 @@
-// src/pages/CrisisToolboxPage.tsx
 import { useState } from 'react';
 import {
   VStack, Heading, Text, FormControl, FormLabel, Input, Button, useToast, Box,
-  HStack, IconButton, SimpleGrid, Link, Select, Textarea
+  HStack, IconButton, SimpleGrid, Link, Select, Textarea, Icon
 } from '@chakra-ui/react';
 import { FaTrashAlt, FaLink, FaStickyNote } from 'react-icons/fa';
 import { useAppContext } from '../context/AppContext';
+
+// Interfaces definidas localmente
+interface ToolboxItem {
+  id: number;
+  type: 'note' | 'link';
+  title: string;
+  content: string;
+}
 
 export function CrisisToolboxPage() {
   const { toolboxItems, addToolboxItem, deleteToolboxItem } = useAppContext();
@@ -30,6 +37,7 @@ export function CrisisToolboxPage() {
     <VStack spacing={8} align="stretch" w="100%">
       <VStack align="start">
         <Heading>Caixa de Ferramentas para Crises</Heading>
+        {/* TEXTO DE INSTRUÇÃO ADICIONADO */}
         <Text color="gray.500">
           Guarde aqui notas e links úteis para momentos de sobrecarga ou ansiedade.
         </Text>

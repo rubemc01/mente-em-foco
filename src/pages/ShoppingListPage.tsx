@@ -1,4 +1,3 @@
-// src/pages/ShoppingListPage.tsx
 import { useState } from 'react';
 import {
   VStack, Heading, Text, Input, Button, useToast, Box, HStack, IconButton, Spacer,
@@ -6,6 +5,18 @@ import {
 } from '@chakra-ui/react';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import { useAppContext } from '../context/AppContext';
+
+// Interfaces definidas localmente
+interface ShoppingListItem {
+  id: number;
+  text: string;
+  isCompleted: boolean;
+}
+interface ShoppingList {
+  id: number;
+  name: string;
+  items: ShoppingListItem[];
+}
 
 export function ShoppingListPage() {
   const { shoppingLists, addShoppingList, deleteShoppingList, addShoppingItem, toggleShoppingItem, deleteShoppingItem } = useAppContext();
@@ -29,16 +40,20 @@ export function ShoppingListPage() {
 
   return (
     <VStack spacing={8} align="stretch" w="100%">
-      <Heading>Listas de Compras</Heading>
+      <VStack align="start">
+        <Heading>Listas de Compras</Heading>
+        {/* TEXTO DE INSTRUÇÃO ADICIONADO */}
+        <Text color="gray.500">Crie e gira as suas listas de compras para não se esquecer de nada.</Text>
+      </VStack>
 
       <Box as="form" onSubmit={handleAddList} p={6} bg="white" borderRadius="md" boxShadow="sm">
         <HStack>
-          <Input value={newListName} onChange={e => setNewListName(e.target.value)} placeholder="Nova lista de compras (ex: Supermercado)" />
-          <Button type="submit" colorScheme="teal">Criar Lista</Button>
+          <Input value={newListName} onChange={e => setNewListName(e.target.value)} placeholder="Nova lista (ex: Supermercado, Farmácia)" />
+          <Button type="submit" colorScheme="bluePrimary">Criar Lista</Button>
         </HStack>
       </Box>
 
-      <Accordion allowMultiple defaultIndex={[0]}>
+      <Accordion allowMultiple defaultIndex={[0]} w="100%">
         {shoppingLists.map(list => (
           <AccordionItem key={list.id} bg="white" borderRadius="md" boxShadow="sm" mb={4}>
             <h2>
@@ -67,7 +82,7 @@ export function ShoppingListPage() {
                     placeholder="Adicionar item..."
                     variant="flushed"
                   />
-                  <IconButton type="submit" aria-label="Adicionar item" icon={<FaPlus />} size="sm" variant="ghost" colorScheme="teal" />
+                  <IconButton type="submit" aria-label="Adicionar item" icon={<FaPlus />} size="sm" variant="ghost" colorScheme="bluePrimary" />
                 </HStack>
               </VStack>
               <Button mt={4} size="sm" colorScheme="red" variant="outline" onClick={() => deleteShoppingList(list.id)}>
