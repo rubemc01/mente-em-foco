@@ -3,13 +3,15 @@ import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth, db } from '../firebaseConfig';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 
-// --- INTERFACES ---
+// --- INTERFACES DEFINIDAS LOCALMENTE (SEM EXPORT) ---
 interface Subtask { id: number; text: string; isCompleted: boolean; }
 interface Task {
   id: number;
   text: string;
   isCompleted: boolean;
   subtasks?: Subtask[];
+  dueDate?: string;
+  notified?: boolean;
 }
 interface Achievement { id: number; text: string; date: string; }
 interface AppSettings { focusDuration: number; shortBreakDuration: number; longBreakDuration: number; }
@@ -30,6 +32,7 @@ interface AppContextType {
   toggleTask: (id: number) => void;
   addSubtask: (parentId: number, subtaskText: string) => void;
   toggleSubtask: (parentId: number, subtaskId: number) => void;
+  setTaskDueDate: (taskId: number, dueDate: string | null) => void;
   activeTask: Task | null;
   setActiveTask: (task: Task | null) => void;
   settings: AppSettings;
@@ -103,13 +106,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => unsubscribeAuth();
   }, []);
 
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
+    const intervalId = setInterval(() => {
+      if (!currentUser || tasks.length === 0) return;
+      const now = new Date();
+      const upcomingTasks = tasks.filter(task => {
+        if (!task.dueDate || task.isCompleted || task.notified) return false;
+        const dueDate = new Date(task.dueDate);
+        return dueDate <= now;
+      });
+      if (upcomingTasks.length > 0) {
+        upcomingTasks.forEach(task => {
+          new Notification('Lembrete: Mente em Foco', {
+            body: `Está na hora de começar a tarefa: "${task.text}"`,
+            icon: '/vite.svg',
+          });
+        });
+        const updatedTasks = tasks.map(t => {
+          if (upcomingTasks.some(ut => ut.id === t.id)) {
+            return { ...t, notified: true };
+          }
+          return t;
+        });
+        writeToDb({ tasks: updatedTasks });
+      }
+    }, 60000);
+    return () => clearInterval(intervalId);
+  }, [tasks, currentUser]);
+
   const writeToDb = (data: object) => {
     if (currentUser) {
       const userDocRef = doc(db, "users", currentUser.uid);
       setDoc(userDocRef, data, { merge: true });
     }
   };
-
   const calculateLevel = (xp: number) => Math.floor(xp / 1000) + 1;
 
   const addXp = (amount: number) => {
@@ -119,7 +152,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     writeToDb({ userProfile: newProfile });
   };
 
-  const addTask = (text: string) => writeToDb({ tasks: [...tasks, { id: Date.now(), text, isCompleted: false, subtasks: [] }] });
+  const addTask = (text: string) => writeToDb({ tasks: [...tasks, { id: Date.now(), text, isCompleted: false, subtasks: [], notified: false }] });
   const deleteTask = (id: number) => writeToDb({ tasks: tasks.filter(task => task.id !== id) });
   const toggleTask = (id: number) => {
     const task = tasks.find(t => t.id === id);
@@ -141,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const loadTemplate = (templateId: number) => {
     const template = templates.find(t => t.id === templateId);
     if (!template) return;
-    const newTasks: Task[] = template.items.map(itemText => ({ id: Date.now() + Math.random(), text: itemText, isCompleted: false, subtasks: [] }));
+    const newTasks: Task[] = template.items.map(itemText => ({ id: Date.now() + Math.random(), text: itemText, isCompleted: false, subtasks: [], notified: false }));
     writeToDb({ tasks: [...tasks, ...newTasks] });
   };
   const addToolboxItem = (item: Omit<ToolboxItem, 'id'>) => writeToDb({ toolboxItems: [...toolboxItems, { ...item, id: Date.now() }] });
@@ -165,6 +198,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const otherEntries = moodHistory.filter(entry => entry.date !== today);
     writeToDb({ moodHistory: [newEntry, ...otherEntries] });
   };
+  const setTaskDueDate = (taskId: number, dueDate: string | null) => {
+    writeToDb({ tasks: tasks.map(task => task.id === taskId ? { ...task, dueDate: dueDate || undefined, notified: false } : task) });
+  };
 
   const value = {
     tasks, addTask, deleteTask, toggleTask, addSubtask, toggleSubtask,
@@ -177,6 +213,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     shoppingLists, addShoppingList, deleteShoppingList, addShoppingItem, toggleShoppingItem, deleteShoppingItem,
     moodHistory, addMoodEntry,
     userProfile, addXp,
+    setTaskDueDate,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

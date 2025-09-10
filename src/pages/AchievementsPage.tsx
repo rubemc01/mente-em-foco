@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { VStack, Heading, Text, Input, Button, HStack, Box } from '@chakra-ui/react';
 import { useAppContext } from '../context/AppContext';
 
-// Interfaces definidas localmente
+// Interface definida localmente
 interface Achievement {
   id: number;
   text: string;
@@ -33,7 +33,6 @@ export function AchievementsPage() {
     <VStack spacing={8} align="stretch" w="100%">
       <VStack align="start">
         <Heading>Diário de Conquistas</Heading>
-        {/* TEXTO DE INSTRUÇÃO ADICIONADO */}
         <Text color="gray.500">
           Anote as suas vitórias do dia, não importa o quão pequenas pareçam. Celebrar o progresso é um grande motivador!
         </Text>
@@ -49,7 +48,7 @@ export function AchievementsPage() {
           />
           <Button type="submit" colorScheme="bluePrimary" px={8}>Adicionar</Button>
         </HStack>
-      </form>
+      </Box> {/* <-- AQUI ESTÁ A CORREÇÃO */}
 
       <VStack spacing={6} align="stretch" w="100%">
         {Object.keys(groupedAchievements).length > 0 ? (

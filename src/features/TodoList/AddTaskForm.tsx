@@ -1,24 +1,27 @@
-import { useState, FormEvent } from 'react';
-import { Button, Input, HStack } from '@chakra-ui/react';
+import { useState } from 'react';
+import { HStack, Input, Button } from '@chakra-ui/react';
+import { useAppContext } from '../../context/AppContext';
 
-interface AddTaskFormProps {
-  onAddTask: (text: string) => void;
-}
-
-export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
+export function AddTaskForm() {
   const [text, setText] = useState('');
+  const { addTask } = useAppContext();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
-    onAddTask(text);
+    addTask(text);
     setText('');
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-      <HStack width="100%">
-        <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Qual sua próxima tarefa?" variant="filled" />
+      <HStack>
+        <Input 
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Qual sua próxima tarefa?"
+          variant="filled"
+        />
         <Button type="submit" colorScheme="teal" px={8}>
           Adicionar
         </Button>

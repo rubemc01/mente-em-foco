@@ -3,23 +3,15 @@ import { AddTaskForm } from './AddTaskForm';
 import { TaskItem } from './TaskItem';
 import { useAppContext } from '../../context/AppContext';
 
-export interface Subtask { id: number; text: string; isCompleted: boolean; }
-export interface Task {
-  id: number;
-  text: string;
-  isCompleted: boolean;
-  subtasks?: Subtask[];
-}
-
 export function TodoList() {
-  const { tasks, addTask } = useAppContext();
+  const { tasks } = useAppContext();
 
   return (
     <VStack spacing={6} align="stretch" width="100%" maxW="600px">
       <Heading as="h2" size="lg" textAlign="center">
         Minhas Tarefas
       </Heading>
-      <AddTaskForm onAddTask={addTask} />
+      <AddTaskForm />
       <VStack spacing={3} pt={4}>
         {tasks.length > 0 ? (
           tasks.map((task) => (

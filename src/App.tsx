@@ -1,9 +1,9 @@
-import { Box, ChakraProvider, CSSReset, extendTheme, Flex, IconButton, useDisclosure, Tooltip } from '@chakra-ui/react';
+import { Box, ChakraProvider, CSSReset, extendTheme, Flex, IconButton, useDisclosure, Tooltip, HStack, Spacer, Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton, Icon } from '@chakra-ui/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { FaLightbulb } from 'react-icons/fa';
+import { FaLightbulb, FaBars } from 'react-icons/fa';
 
 import { AppProvider } from './context/AppContext';
-import { Sidebar } from './components/Sidebar/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar'; // Importa o Sidebar
 import { QuickNotepad } from './components/QuickNotepad/QuickNotepad';
 import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 
@@ -20,10 +20,8 @@ import { MoodTrackerPage } from './pages/MoodTrackerPage';
 import { HelpPage } from './pages/HelpPage';
 import { CalendarPage } from './pages/CalendarPage';
 
-// --- DEFINIÇÃO COMPLETA DO TEMA ---
 const theme = extendTheme({
   colors: {
-    // Cores baseadas no logo
     bluePrimary: {
       50: '#E6F0FF',
       100: '#BFD9FF',
@@ -83,7 +81,8 @@ const theme = extendTheme({
 });
 
 function App() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
+  const { isOpen: isNotepadOpen, onOpen: onNotepadOpen, onClose: onNotepadClose } = useDisclosure();
 
   return (
     <AppProvider>
@@ -91,11 +90,25 @@ function App() {
         <CSSReset />
         <BrowserRouter>
           <Flex>
-            <Sidebar />
-            <Box as="main" flex="1" p={8} display="flex" justifyContent="center">
+            {/* O Sidebar que só aparece em ecrãs de computador */}
+            <Box display={{ base: 'none', md: 'flex' }}>
+              <Sidebar />
+            </Box>
+            
+            <Box as="main" flex="1" p={{ base: 4, md: 8 }} display="flex" flexDirection="column" alignItems="center">
+              {/* O cabeçalho com o botão que só aparece em telemóveis */}
+              <HStack w="100%" display={{ base: 'flex', md: 'none' }} mb={4}>
+                <IconButton
+                  aria-label="Abrir Menu"
+                  icon={<Icon as={FaBars} />}
+                  onClick={onMenuOpen}
+                  variant="ghost"
+                />
+                <Spacer />
+              </HStack>
+
               <Routes>
                 <Route path="/login" element={<AuthPage />} />
-
                 <Route element={<ProtectedRoute />}>
                   <Route path="/" element={<DashboardPage />} />
                   <Route path="/progresso" element={<ProgressPage />} />
@@ -113,6 +126,15 @@ function App() {
             </Box>
           </Flex>
 
+          {/* O Drawer (menu deslizante) para telemóveis */}
+          <Drawer isOpen={isMenuOpen} placement="left" onClose={onMenuClose}>
+            <DrawerOverlay />
+            <DrawerContent>
+              <DrawerCloseButton />
+              <Sidebar />
+            </DrawerContent>
+          </Drawer>
+
           <Tooltip label="Abrir Bloco de Notas Rápido" fontSize="md" placement="left" hasArrow>
             <IconButton
               aria-label="Abrir Bloco de Notas"
@@ -123,15 +145,13 @@ function App() {
               position="fixed"
               bottom="2rem"
               right="2rem"
-              onClick={onOpen}
+              onClick={onNotepadOpen}
               boxShadow="xl"
               zIndex="10"
             />
           </Tooltip>
           
-          <QuickNotepad isOpen={isOpen} onClose={onClose} />
-          
-          {/* O EstimationModal foi removido daqui */}
+          <QuickNotepad isOpen={isNotepadOpen} onClose={onNotepadClose} />
           
         </BrowserRouter>
       </ChakraProvider>

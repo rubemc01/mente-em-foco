@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mente em Foco</string>
+    <string name="title_activity_main">Mente em Foco</string>
+    <string name="package_name">com.rubem.menteemfoco</string>
+    <string name="custom_url_scheme">com.rubem.menteemfoco</string>
+    <string name="server_client_id">346431881707-uu8nff3h3cbbnts8e7i8r3linmrucrgs.apps.googleusercontent.com</string>
+</resources>

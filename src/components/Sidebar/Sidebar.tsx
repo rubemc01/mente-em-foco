@@ -42,7 +42,7 @@ export function Sidebar() {
     <Box
       as="nav"
       w="250px"
-      h="100vh"
+      h="full" // Garante que ocupa 100% da altura
       p={4}
       borderRight="1px"
       borderColor="gray.200"
@@ -112,7 +112,6 @@ export function Sidebar() {
           )}
         </Box>
         
-        {/* --- CRÉDITOS ADICIONADOS --- */}
         <Box pt={4} textAlign="center">
           <Text fontSize="xs" color="gray.500">
             © 2025 - Rubem Cesar Terapias
@@ -121,7 +120,6 @@ export function Sidebar() {
             rubemcesarterapias.com
           </Link>
         </Box>
-
       </VStack>
     </Box>
   );
